@@ -5,12 +5,8 @@
  */
 package biblioteca;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.sql.*;
+
 import javax.swing.JOptionPane;
 
 /**
@@ -22,12 +18,19 @@ public class Administrador extends javax.swing.JFrame {
     /**
      * Creates new form Administrador
      */
+    ConeccionDB con = new ConeccionDB();
+    Connection cn = con.establecerConeccion();
+
     public Administrador() {
         initComponents();
         this.setLocationRelativeTo(null);
         txtCodigo.setEditable(false);
         txtNombre.requestFocus();
-        
+        con.establecerConeccion();
+        mostrarPaises();
+        mostrarEditorial();
+        mostrarAutores();
+        mostrarCategorias();
     }
 
     /**
@@ -57,6 +60,12 @@ public class Administrador extends javax.swing.JFrame {
         cmbMostrarOpciones = new javax.swing.JComboBox<>();
         btnMostrarLibros = new javax.swing.JButton();
         btnInicio = new javax.swing.JButton();
+        btnAgregarAutor = new javax.swing.JButton();
+        cmbAutor = new javax.swing.JComboBox<>();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        cmbCategorias = new javax.swing.JComboBox<>();
+        btnAgregarCategoria = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -80,15 +89,12 @@ public class Administrador extends javax.swing.JFrame {
         jLabel5.setFont(new java.awt.Font("Corbel", 1, 14)); // NOI18N
         jLabel5.setText("Editorial:");
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 100, -1, -1));
-
-        cmbEditorial.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         getContentPane().add(cmbEditorial, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 100, 270, -1));
 
         jLabel6.setFont(new java.awt.Font("Corbel", 1, 14)); // NOI18N
         jLabel6.setText("País:");
         getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 140, 40, -1));
 
-        cmbPais.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         getContentPane().add(cmbPais, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 140, 180, -1));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -104,10 +110,15 @@ public class Administrador extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(42, 250, 650, 150));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 280, 650, 150));
 
         btnAccion.setText("OK");
-        getContentPane().add(btnAccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 200, -1, -1));
+        btnAccion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAccionActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnAccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 220, -1, -1));
 
         btnAgregarPais.setText("Agregar País");
         btnAgregarPais.addActionListener(new java.awt.event.ActionListener() {
@@ -115,10 +126,15 @@ public class Administrador extends javax.swing.JFrame {
                 btnAgregarPaisActionPerformed(evt);
             }
         });
-        getContentPane().add(btnAgregarPais, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 200, 110, -1));
+        getContentPane().add(btnAgregarPais, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 220, 110, -1));
 
         btnAgregarEditorial.setText("Agregar Editorial");
-        getContentPane().add(btnAgregarEditorial, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 170, -1, -1));
+        btnAgregarEditorial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgregarEditorialActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnAgregarEditorial, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 190, -1, -1));
 
         cmbMostrarOpciones.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Agregar Libro", "Eliminar Libro" }));
         cmbMostrarOpciones.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -134,7 +150,7 @@ public class Administrador extends javax.swing.JFrame {
         getContentPane().add(cmbMostrarOpciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, 160, -1));
 
         btnMostrarLibros.setText("Mostrar Libros");
-        getContentPane().add(btnMostrarLibros, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 410, -1, -1));
+        getContentPane().add(btnMostrarLibros, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 440, -1, -1));
 
         btnInicio.setText("Inicio");
         btnInicio.addActionListener(new java.awt.event.ActionListener() {
@@ -144,30 +160,119 @@ public class Administrador extends javax.swing.JFrame {
         });
         getContentPane().add(btnInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 440, -1, -1));
 
+        btnAgregarAutor.setText("Agregar Autor");
+        btnAgregarAutor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgregarAutorActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnAgregarAutor, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 250, 110, -1));
+
+        getContentPane().add(cmbAutor, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 140, 270, -1));
+
+        jLabel7.setFont(new java.awt.Font("Corbel", 1, 14)); // NOI18N
+        jLabel7.setText("Autor:");
+        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 140, -1, -1));
+
+        jLabel8.setFont(new java.awt.Font("Corbel", 1, 14)); // NOI18N
+        jLabel8.setText("Categoria:");
+        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 180, -1, -1));
+
+        getContentPane().add(cmbCategorias, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 180, 160, -1));
+
+        btnAgregarCategoria.setText("Agregar Categoria");
+        btnAgregarCategoria.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgregarCategoriaActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnAgregarCategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 190, -1, -1));
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/bestbooks.jpg"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 720, 480));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    public void mostrarPaises() {
+        try {
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM paises ");
+            while (rs.next()) {
+                cmbPais.addItem(rs.getString(2));
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void mostrarEditorial() {
+        try {
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM editoriales ");
+            while (rs.next()) {
+                cmbEditorial.addItem(rs.getString(2));
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void mostrarAutores() {
+        try {
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM autores ");
+            while (rs.next()) {
+                cmbAutor.addItem(rs.getString(2));
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    
+     public void mostrarCategorias() {
+        try {
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM categoria ");
+            while (rs.next()) {
+                cmbCategorias.addItem(rs.getString(2));
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+
     private void btnAgregarPaisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarPaisActionPerformed
-       
+        String pais = JOptionPane.showInputDialog("Ingrese el nombre del país");
+        String sql = "INSERT INTO paises (pais) VALUES ('" + pais + "')";
+        try {
+            Statement st = cn.createStatement();
+            st.executeUpdate(sql);
+            ResultSet rs = st.executeQuery("SELECT * FROM paises WHERE pais='" + pais + "'");
+            if (rs.next()) {
+                cmbPais.addItem(rs.getString(2));
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+        }
     }//GEN-LAST:event_btnAgregarPaisActionPerformed
 
     private void cmbMostrarOpcionesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmbMostrarOpcionesMouseClicked
-        
+
     }//GEN-LAST:event_cmbMostrarOpcionesMouseClicked
 
     private void cmbMostrarOpcionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbMostrarOpcionesActionPerformed
-        if(cmbMostrarOpciones.getSelectedItem().equals("Agregar Libro")){
+        if (cmbMostrarOpciones.getSelectedItem().equals("Agregar Libro")) {
             txtCodigo.setEditable(false);
             txtNombre.setEditable(true);
             txtISBN.setEditable(true);
             txtNombre.requestFocus();
             cmbEditorial.setEnabled(true);
             cmbPais.setEnabled(true);
-            
-        }else if(cmbMostrarOpciones.getSelectedItem().equals("Eliminar Libro")){
+
+        } else if (cmbMostrarOpciones.getSelectedItem().equals("Eliminar Libro")) {
             txtCodigo.setEditable(true);
             txtNombre.setEditable(false);
             txtISBN.setEditable(false);
@@ -182,6 +287,70 @@ public class Administrador extends javax.swing.JFrame {
         form.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnInicioActionPerformed
+
+    private void btnAgregarEditorialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarEditorialActionPerformed
+        String editorial = JOptionPane.showInputDialog("Ingrese el nombre de la Editorial");
+        String sql = "INSERT INTO editoriales (editorial) VALUES ('" + editorial + "')";
+        try {
+            Statement st = cn.createStatement();
+            st.executeUpdate(sql);
+            ResultSet rs = st.executeQuery("SELECT * FROM paises WHERE pais='" + editorial + "'");
+            if (rs.next()) {
+                cmbEditorial.addItem(rs.getString(2));
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+        }
+    }//GEN-LAST:event_btnAgregarEditorialActionPerformed
+
+    private void btnAgregarAutorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarAutorActionPerformed
+        String autor = JOptionPane.showInputDialog("Ingrese el nombre del Autor");
+        String sql = "INSERT INTO autores (autor) VALUES ('" + autor + "')";
+        try {
+            Statement st = cn.createStatement();
+            st.executeUpdate(sql);
+            ResultSet rs = st.executeQuery("SELECT * FROM autores WHERE autor='" + autor + "'");
+            if (rs.next()) {
+                cmbAutor.addItem(rs.getString(2));
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+        }
+    }//GEN-LAST:event_btnAgregarAutorActionPerformed
+
+    private void btnAccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAccionActionPerformed
+        if(cmbMostrarOpciones.getSelectedIndex()==0){
+            String sql = "INSERT INTO libros(isbn, titulo,editoriales_id_editorial,paises_id_pais, autor, categoria) VALUES ('"+txtISBN.getText()+"', "
+                    + "'"+txtNombre.getText()+"','"+(cmbEditorial.getSelectedIndex()+1)+"','"+(cmbPais.getSelectedIndex()+1)+"','"+(cmbAutor.getSelectedIndex()+1)+"', "
+                    + "'"+(cmbCategorias.getSelectedIndex()+1)+"')";
+            
+            try{
+                Statement st = cn.createStatement();
+                st.executeUpdate(sql);
+            }catch(Exception e ){
+                System.out.println("error: "+e);
+            }
+        }else{
+            
+        }
+    }//GEN-LAST:event_btnAccionActionPerformed
+
+    private void btnAgregarCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarCategoriaActionPerformed
+        String categoria = JOptionPane.showInputDialog("Ingrese el nombre de la categoria");
+        String sql = "INSERT INTO categoria (categoria) VALUES ('" + categoria+ "')";
+        try {
+            Statement st = cn.createStatement();
+            st.executeUpdate(sql);
+            ResultSet rs = st.executeQuery("SELECT * FROM  WHERE categoria='" + categoria+ "'");
+            if (rs.next()) {
+                cmbCategorias.addItem(rs.getString(2));
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+        }
+    }//GEN-LAST:event_btnAgregarCategoriaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -220,10 +389,14 @@ public class Administrador extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAccion;
+    private javax.swing.JButton btnAgregarAutor;
+    private javax.swing.JButton btnAgregarCategoria;
     private javax.swing.JButton btnAgregarEditorial;
     private javax.swing.JButton btnAgregarPais;
     private javax.swing.JButton btnInicio;
     private javax.swing.JButton btnMostrarLibros;
+    private javax.swing.JComboBox<String> cmbAutor;
+    private javax.swing.JComboBox<String> cmbCategorias;
     private javax.swing.JComboBox<String> cmbEditorial;
     private javax.swing.JComboBox<String> cmbMostrarOpciones;
     private javax.swing.JComboBox<String> cmbPais;
@@ -233,6 +406,8 @@ public class Administrador extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField txtCodigo;

@@ -40,6 +40,10 @@ public class Usuario extends javax.swing.JFrame {
         txtCodLibro = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         btnInicio = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        txtCodUsuario = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        cmbTipoPrestamo = new javax.swing.JComboBox<>();
         fondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -65,7 +69,7 @@ public class Usuario extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 110, 620, 180));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 90, 620, 180));
 
         jLabel1.setFont(new java.awt.Font("Corbel", 1, 14)); // NOI18N
         jLabel1.setText("Nombre del libro");
@@ -73,12 +77,12 @@ public class Usuario extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Corbel", 1, 18)); // NOI18N
         jLabel2.setText("Reservación");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 320, -1, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 290, -1, -1));
 
         jLabel3.setFont(new java.awt.Font("Corbel", 1, 14)); // NOI18N
         jLabel3.setText("Código del libro:");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 360, -1, -1));
-        getContentPane().add(txtCodLibro, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 360, 120, -1));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 330, -1, -1));
+        getContentPane().add(txtCodLibro, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 330, 120, -1));
 
         jButton1.setText("Reservar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -86,7 +90,7 @@ public class Usuario extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 400, -1, -1));
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 440, -1, -1));
 
         btnInicio.setText("Inicio");
         btnInicio.addActionListener(new java.awt.event.ActionListener() {
@@ -95,6 +99,18 @@ public class Usuario extends javax.swing.JFrame {
             }
         });
         getContentPane().add(btnInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 440, -1, -1));
+
+        jLabel4.setFont(new java.awt.Font("Corbel", 1, 14)); // NOI18N
+        jLabel4.setText("Usuario:");
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 360, -1, -1));
+        getContentPane().add(txtCodUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 360, 120, -1));
+
+        jLabel5.setFont(new java.awt.Font("Corbel", 1, 14)); // NOI18N
+        jLabel5.setText("Tipo de Prestamo:");
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 390, -1, -1));
+
+        cmbTipoPrestamo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Interno", "Externo" }));
+        getContentPane().add(cmbTipoPrestamo, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 390, 120, -1));
 
         fondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/bestbooks.jpg"))); // NOI18N
         getContentPane().add(fondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 720, 480));
@@ -152,14 +168,18 @@ public class Usuario extends javax.swing.JFrame {
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnInicio;
     private javax.swing.JButton btnMostrarTodo;
+    private javax.swing.JComboBox<String> cmbTipoPrestamo;
     private javax.swing.JLabel fondo;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField txtBuscar;
     private javax.swing.JTextField txtCodLibro;
+    private javax.swing.JTextField txtCodUsuario;
     // End of variables declaration//GEN-END:variables
 }

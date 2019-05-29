@@ -61,7 +61,7 @@ public class FormularioInicial extends javax.swing.JFrame {
         jLabel2.setText("Usuario");
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 290, -1, -1));
 
-        fondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/bestbooks.jpg"))); // NOI18N
+        fondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/fondo libro 3.jpg"))); // NOI18N
         getContentPane().add(fondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 720, 480));
 
         pack();

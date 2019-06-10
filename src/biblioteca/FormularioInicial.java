@@ -5,6 +5,10 @@
  */
 package biblioteca;
 
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Noé
@@ -68,8 +72,16 @@ public class FormularioInicial extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAdministradorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdministradorActionPerformed
-        Administrador ventana2 = new Administrador();
-        ventana2.setVisible(true);
+        Administrador ventana2;
+        try {
+            ventana2 = new Administrador();
+            ventana2.setVisible(true);
+        } catch (SQLException ex) {
+            Logger.getLogger(FormularioInicial.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(FormularioInicial.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         this.setVisible(false);
     }//GEN-LAST:event_btnAdministradorActionPerformed
 

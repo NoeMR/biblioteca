@@ -8,6 +8,12 @@ package biblioteca;
 import java.sql.*;
 
 import javax.swing.JOptionPane;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.sql.Connection;
+import java.util.Date;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -20,10 +26,15 @@ public class Administrador extends javax.swing.JFrame {
      */
     ConeccionDB con = new ConeccionDB();
     Connection cn = con.establecerConeccion();
+    DefaultTableModel modelo;
 
-    public Administrador() {
+    public Administrador() throws SQLException, ClassNotFoundException {
         initComponents();
         this.setLocationRelativeTo(null);
+        String cabecera[] = {"Id", "ISBN", "Titulo", "Editorial", "Pais"};
+        String datos[][] = {};
+        modelo = new DefaultTableModel(datos, cabecera);
+        jTable1.setModel(modelo);
         txtCodigo.setEditable(false);
         txtNombre.requestFocus();
         con.establecerConeccion();
@@ -31,6 +42,7 @@ public class Administrador extends javax.swing.JFrame {
         mostrarEditorial();
         mostrarAutores();
         mostrarCategorias();
+
     }
 
     /**
@@ -150,6 +162,11 @@ public class Administrador extends javax.swing.JFrame {
         getContentPane().add(cmbMostrarOpciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, 160, -1));
 
         btnMostrarLibros.setText("Mostrar Libros");
+        btnMostrarLibros.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMostrarLibrosActionPerformed(evt);
+            }
+        });
         getContentPane().add(btnMostrarLibros, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 440, -1, -1));
 
         btnInicio.setText("Inicio");
@@ -229,8 +246,8 @@ public class Administrador extends javax.swing.JFrame {
             System.out.println(e);
         }
     }
-    
-     public void mostrarCategorias() {
+
+    public void mostrarCategorias() {
         try {
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM categoria ");
@@ -242,6 +259,22 @@ public class Administrador extends javax.swing.JFrame {
         }
     }
 
+    public void mostrarLibros() {
+        try {
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM libros ");
+            while (rs.next()) {
+                String datos[] = new String[5];
+                for (int i = 0; i < datos.length; i++) {
+                    datos[i] = rs.getString(i + 1);
+                    System.out.println(rs.getString(i + 1));
+                }
+                modelo.addRow(datos);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
 
     private void btnAgregarPaisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarPaisActionPerformed
         String pais = JOptionPane.showInputDialog("Ingrese el nombre del país");
@@ -320,29 +353,26 @@ public class Administrador extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAgregarAutorActionPerformed
 
     private void btnAccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAccionActionPerformed
-        if(cmbMostrarOpciones.getSelectedIndex()==0){
-            String sql = "INSERT INTO libros(isbn, titulo,editoriales_id_editorial,paises_id_pais, autor, categoria) VALUES ('"+txtISBN.getText()+"', "
-                    + "'"+txtNombre.getText()+"','"+(cmbEditorial.getSelectedIndex()+1)+"','"+(cmbPais.getSelectedIndex()+1)+"','"+(cmbAutor.getSelectedIndex()+1)+"', "
-                    + "'"+(cmbCategorias.getSelectedIndex()+1)+"')";
-            
-            try{
+        if (cmbMostrarOpciones.getSelectedIndex() == 0) {
+            String sql = "INSERT INTO libros(id_libro, isbn, titulo, editoriales_id_editorial, paises_id_pais) VALUES ('" + 0 + "', '" + txtISBN.getText() + "', '" + txtNombre.getText() + "', '" + (cmbEditorial.getSelectedIndex() + 1) + "', '" + (cmbPais.getSelectedIndex() + 1) + "')";
+            try {
                 Statement st = cn.createStatement();
                 st.executeUpdate(sql);
-            }catch(Exception e ){
-                System.out.println("error: "+e);
+            } catch (Exception e) {
+                System.out.println("error: " + e);
             }
-        }else{
-            
+        } else {
+
         }
     }//GEN-LAST:event_btnAccionActionPerformed
 
     private void btnAgregarCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarCategoriaActionPerformed
         String categoria = JOptionPane.showInputDialog("Ingrese el nombre de la categoria");
-        String sql = "INSERT INTO categoria (categoria) VALUES ('" + categoria+ "')";
+        String sql = "INSERT INTO categoria(categoria) VALUES ('" + categoria + "')";
         try {
             Statement st = cn.createStatement();
             st.executeUpdate(sql);
-            ResultSet rs = st.executeQuery("SELECT * FROM  WHERE categoria='" + categoria+ "'");
+            ResultSet rs = st.executeQuery("SELECT * FROM categoria WHERE categoria='" + categoria + "'");
             if (rs.next()) {
                 cmbCategorias.addItem(rs.getString(2));
             }
@@ -351,6 +381,10 @@ public class Administrador extends javax.swing.JFrame {
             System.out.println("Error: " + e);
         }
     }//GEN-LAST:event_btnAgregarCategoriaActionPerformed
+
+    private void btnMostrarLibrosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarLibrosActionPerformed
+        mostrarLibros();
+    }//GEN-LAST:event_btnMostrarLibrosActionPerformed
 
     /**
      * @param args the command line arguments
@@ -382,7 +416,13 @@ public class Administrador extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Administrador().setVisible(true);
+                try {
+                    new Administrador().setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(Administrador.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(Administrador.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }

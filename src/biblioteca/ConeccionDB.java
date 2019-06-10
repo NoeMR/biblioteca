@@ -2,19 +2,20 @@ package biblioteca;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
 
 public class ConeccionDB {
-    Connection conexion = null;
-    String url = "jdbc:mysql://localhost/biblioteca";
-    String user = "Noe";
-    String pass = "pass";
-    public Connection establecerConeccion(){
-        try{
-        conexion = DriverManager.getConnection(url,user,pass);
-        }catch(Exception ex){
-            System.out.println("Error: "+ex);
+    Connection conectar = null;
+    
+    public Connection establecerConeccion() throws SQLException, ClassNotFoundException{
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conectar = DriverManager.getConnection("jdbc:mysql://localhost:3306/biblioteca", "userb", "pass");
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Error" + ex);
         }
-        return conexion;
+        return conectar;
     }
     
     

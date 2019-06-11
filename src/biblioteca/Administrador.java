@@ -6,13 +6,10 @@
 package biblioteca;
 
 import java.sql.*;
-
 import javax.swing.JOptionPane;
-import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.Connection;
-import java.util.Date;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -42,7 +39,6 @@ public class Administrador extends javax.swing.JFrame {
         mostrarEditorial();
         mostrarAutores();
         mostrarCategorias();
-
     }
 
     /**
@@ -263,12 +259,19 @@ public class Administrador extends javax.swing.JFrame {
         try {
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM libros ");
-            while (rs.next()) {
-                String datos[] = new String[5];
-                for (int i = 0; i < datos.length; i++) {
+            Statement st2 = cn.createStatement();
+            ResultSet rs2 = st2.executeQuery("SELECT a.paises_id_pais, b.pais FROM libros a, paises b WHERE a.paises_id_pais=b.id_pais");
+            Statement st3 = cn.createStatement();
+            ResultSet rs3 = st3.executeQuery("SELECT a.editoriales_id_editorial, b.editorial FROM libros a, editoriales b WHERE a.editoriales_id_editorial=b.id_editorial");
+            Statement st4 = cn.createStatement();
+            //ResultSet rs4 = st4.executeQuery("SELECT a.id_libros_autores, b.id_libro c.autores_id_autor d.id_autor FROM libros_autores a, libros b, libros_autores c, autores d WHERE a.id_libros_autores=b.id_libros, b");
+            String datos[] = new String[5];           
+            while (rs.next() && rs2.next() && rs3.next()) {
+                for (int i = 0; i <= 2; i++) {
                     datos[i] = rs.getString(i + 1);
-                    System.out.println(rs.getString(i + 1));
                 }
+                datos[4] = rs2.getString(2);
+                datos[3] = rs3.getString(2);
                 modelo.addRow(datos);
             }
         } catch (Exception e) {

@@ -5,6 +5,14 @@
  */
 package biblioteca;
 
+import javax.swing.JOptionPane;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.sql.Connection;
+import java.util.Date;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Noé
@@ -14,10 +22,16 @@ public class Usuario extends javax.swing.JFrame {
     /**
      * Creates new form Usuario
      */
-    public Usuario() {
+    ConeccionDB con = new ConeccionDB();
+    Connection cn = con.establecerConeccion();
+    DefaultTableModel modelo;
+
+    public Usuario() throws SQLException, ClassNotFoundException {
         initComponents();
         this.setLocationRelativeTo(null);
         txtBuscar.requestFocus();
+        con.establecerConeccion();
+        modeloNuevo();
     }
 
     /**
@@ -51,9 +65,19 @@ public class Usuario extends javax.swing.JFrame {
         getContentPane().add(txtBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 50, 260, -1));
 
         btnBuscar.setText("Buscar");
+        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarActionPerformed(evt);
+            }
+        });
         getContentPane().add(btnBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 50, -1, -1));
 
         btnMostrarTodo.setText("Mostrar Todo");
+        btnMostrarTodo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMostrarTodoActionPerformed(evt);
+            }
+        });
         getContentPane().add(btnMostrarTodo, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 50, -1, -1));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -118,6 +142,13 @@ public class Usuario extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void modeloNuevo(){
+        String cabecera[] = {"Id", "ISBN", "Titulo", "Editorial", "Pais"};
+        String datos[][] = {};
+        modelo = new DefaultTableModel(datos, cabecera);
+        jTable1.setModel(modelo);
+    }
+    
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -126,8 +157,57 @@ public class Usuario extends javax.swing.JFrame {
         FormularioInicial formulario = new FormularioInicial();
         formulario.setVisible(true);
         this.setVisible(false);
-        
+
     }//GEN-LAST:event_btnInicioActionPerformed
+
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+        modeloNuevo();
+        try {
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM libros WHERE titulo='" + txtBuscar.getText() + "'");
+            Statement st2 = cn.createStatement();
+            ResultSet rs2 = st2.executeQuery("SELECT a.paises_id_pais, b.pais FROM libros a, paises b WHERE a.paises_id_pais=b.id_pais");
+            Statement st3 = cn.createStatement();
+            ResultSet rs3 = st3.executeQuery("SELECT a.editoriales_id_editorial, b.editorial FROM libros a, editoriales b WHERE a.editoriales_id_editorial=b.id_editorial");
+            Statement st4 = cn.createStatement();
+            String datos[] = new String[5];
+            while (rs.next() && rs2.next() && rs3.next()) {
+                for (int i = 0; i <= 2; i++) {
+                    datos[i] = rs.getString(i + 1);
+                }
+                datos[4] = rs2.getString(2);
+                datos[3] = rs3.getString(2);
+                modelo.addRow(datos);
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+        }
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void btnMostrarTodoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarTodoActionPerformed
+        modeloNuevo();
+        try {
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM libros ");
+            Statement st2 = cn.createStatement();
+            ResultSet rs2 = st2.executeQuery("SELECT a.paises_id_pais, b.pais FROM libros a, paises b WHERE a.paises_id_pais=b.id_pais");
+            Statement st3 = cn.createStatement();
+            ResultSet rs3 = st3.executeQuery("SELECT a.editoriales_id_editorial, b.editorial FROM libros a, editoriales b WHERE a.editoriales_id_editorial=b.id_editorial");
+            Statement st4 = cn.createStatement();
+            //ResultSet rs4 = st4.executeQuery("SELECT a.id_libros_autores, b.id_libro c.autores_id_autor d.id_autor FROM libros_autores a, libros b, libros_autores c, autores d WHERE a.id_libros_autores=b.id_libros, b");
+            String datos[] = new String[5];           
+            while (rs.next() && rs2.next() && rs3.next()) {
+                for (int i = 0; i <= 2; i++) {
+                    datos[i] = rs.getString(i + 1);
+                }
+                datos[4] = rs2.getString(2);
+                datos[3] = rs3.getString(2);
+                modelo.addRow(datos);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }//GEN-LAST:event_btnMostrarTodoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -159,7 +239,13 @@ public class Usuario extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Usuario().setVisible(true);
+                try {
+                    new Usuario().setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(Usuario.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(Usuario.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }

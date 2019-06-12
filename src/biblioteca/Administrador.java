@@ -28,10 +28,7 @@ public class Administrador extends javax.swing.JFrame {
     public Administrador() throws SQLException, ClassNotFoundException {
         initComponents();
         this.setLocationRelativeTo(null);
-        String cabecera[] = {"Id", "ISBN", "Titulo", "Editorial", "Pais"};
-        String datos[][] = {};
-        modelo = new DefaultTableModel(datos, cabecera);
-        jTable1.setModel(modelo);
+        modeloNuevo();
         txtCodigo.setEditable(false);
         txtNombre.requestFocus();
         con.establecerConeccion();
@@ -207,6 +204,13 @@ public class Administrador extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    public void modeloNuevo() {
+        String cabecera[] = {"Id", "ISBN", "Titulo", "Editorial", "Pais", "Autor", "Categoria"};
+        String datos[][] = {};
+        modelo = new DefaultTableModel(datos, cabecera);
+        jTable1.setModel(modelo);
+    }
+
     public void mostrarPaises() {
         try {
             Statement st = cn.createStatement();
@@ -256,22 +260,27 @@ public class Administrador extends javax.swing.JFrame {
     }
 
     public void mostrarLibros() {
+        modeloNuevo();
         try {
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM libros ");
             Statement st2 = cn.createStatement();
-            ResultSet rs2 = st2.executeQuery("SELECT a.paises_id_pais, b.pais FROM libros a, paises b WHERE a.paises_id_pais=b.id_pais");
+            ResultSet rs2 = st2.executeQuery("SELECT * FROM paises a JOIN libros b ON a.id_pais=b.paises_id_pais");
             Statement st3 = cn.createStatement();
-            ResultSet rs3 = st3.executeQuery("SELECT a.editoriales_id_editorial, b.editorial FROM libros a, editoriales b WHERE a.editoriales_id_editorial=b.id_editorial");
+            ResultSet rs3 = st3.executeQuery("SELECT * FROM editoriales a JOIN libros b ON a.id_editorial=b.editoriales_id_editorial");
             Statement st4 = cn.createStatement();
-            //ResultSet rs4 = st4.executeQuery("SELECT a.id_libros_autores, b.id_libro c.autores_id_autor d.id_autor FROM libros_autores a, libros b, libros_autores c, autores d WHERE a.id_libros_autores=b.id_libros, b");
-            String datos[] = new String[5];           
-            while (rs.next() && rs2.next() && rs3.next()) {
+            ResultSet rs4 = st4.executeQuery("SELECT * FROM autores a JOIN libros_autores b ON a.id_autor=b.autores_id_autor JOIN libros c ON b.libros_id_libro=c.id_libro");
+            Statement st5 = cn.createStatement();
+            ResultSet rs5 = st5.executeQuery("SELECT * FROM categoria a JOIN libros_categoria b ON a.id_categoria=b.categoria_id_categoria JOIN libros c ON b.libros_id_libro=c.id_libro");
+            String datos[] = new String[7];
+            while (rs.next() && rs2.next() && rs3.next() && rs4.next() && rs5.next()) {
                 for (int i = 0; i <= 2; i++) {
                     datos[i] = rs.getString(i + 1);
                 }
                 datos[4] = rs2.getString(2);
                 datos[3] = rs3.getString(2);
+                datos[5] = rs4.getString(2);
+                datos[6] = rs5.getString(2);
                 modelo.addRow(datos);
             }
         } catch (Exception e) {
@@ -301,14 +310,16 @@ public class Administrador extends javax.swing.JFrame {
 
     private void cmbMostrarOpcionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbMostrarOpcionesActionPerformed
         if (cmbMostrarOpciones.getSelectedItem().equals("Agregar Libro")) {
+            txtCodigo.setText("");
             txtCodigo.setEditable(false);
             txtNombre.setEditable(true);
             txtISBN.setEditable(true);
             txtNombre.requestFocus();
             cmbEditorial.setEnabled(true);
             cmbPais.setEnabled(true);
-
         } else if (cmbMostrarOpciones.getSelectedItem().equals("Eliminar Libro")) {
+            txtNombre.setText("");
+            txtISBN.setText("");
             txtCodigo.setEditable(true);
             txtNombre.setEditable(false);
             txtISBN.setEditable(false);
@@ -357,15 +368,36 @@ public class Administrador extends javax.swing.JFrame {
 
     private void btnAccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAccionActionPerformed
         if (cmbMostrarOpciones.getSelectedIndex() == 0) {
-            String sql = "INSERT INTO libros(id_libro, isbn, titulo, editoriales_id_editorial, paises_id_pais) VALUES ('" + 0 + "', '" + txtISBN.getText() + "', '" + txtNombre.getText() + "', '" + (cmbEditorial.getSelectedIndex() + 1) + "', '" + (cmbPais.getSelectedIndex() + 1) + "')";
+            int id_libro = 0;
             try {
                 Statement st = cn.createStatement();
-                st.executeUpdate(sql);
+                st.executeUpdate("INSERT INTO libros(id_libro, isbn, titulo, editoriales_id_editorial, paises_id_pais) VALUES ('" + 0 + "', '" + txtISBN.getText() + "', '" + txtNombre.getText() + "', '" + (cmbEditorial.getSelectedIndex() + 1) + "', '" + (cmbPais.getSelectedIndex() + 1) + "')");
+                Statement st4 = cn.createStatement();
+                ResultSet rs = st4.executeQuery("SELECT * FROM libros WHERE titulo='" + txtNombre.getText() + "'");
+                if (rs.next()){
+                    id_libro = Integer.parseInt(rs.getString(1));
+                }
+                Statement st2 = cn.createStatement();
+                st2.executeUpdate("INSERT INTO libros_autores(id_libros_autores, libros_id_libro, autores_id_autor) VALUES ('" + 0 + "', '" + id_libro + "', '" + (cmbAutor.getSelectedIndex() + 1) + "')");
+                Statement st3 = cn.createStatement();
+                st3.executeUpdate("INSERT INTO libros_categoria(id_libros_categoria, libros_id_libro, categoria_id_categoria) VALUES ('" + 0 + "', '" + id_libro + "', '" + (cmbCategorias.getSelectedIndex() + 1) + "')");
             } catch (Exception e) {
                 System.out.println("error: " + e);
             }
-        } else {
-
+            txtNombre.setText("");
+            txtISBN.setText("");
+        } else if (cmbMostrarOpciones.getSelectedIndex() == 1){
+            try {
+                Statement st2 = cn.createStatement();
+                st2.executeUpdate("DELETE FROM libros_autores WHERE libros_id_libro='" + txtCodigo.getText() + "'");
+                Statement st3 = cn.createStatement();
+                st3.executeUpdate("DELETE FROM libros_categoria WHERE libros_id_libro='" + txtCodigo.getText() + "'");
+                Statement st = cn.createStatement();
+                st.executeUpdate("DELETE FROM libros WHERE id_libro='" + txtCodigo.getText() + "'");
+            } catch (SQLException ex) {
+                Logger.getLogger(Administrador.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            txtCodigo.setText("");
         }
     }//GEN-LAST:event_btnAccionActionPerformed
 

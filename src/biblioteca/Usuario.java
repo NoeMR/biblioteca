@@ -143,7 +143,7 @@ public class Usuario extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void modeloNuevo(){
-        String cabecera[] = {"Id", "ISBN", "Titulo", "Editorial", "Pais"};
+        String cabecera[] = {"Id", "ISBN", "Titulo", "Editorial", "Pais", "Autor", "Categoria"};
         String datos[][] = {};
         modelo = new DefaultTableModel(datos, cabecera);
         jTable1.setModel(modelo);
@@ -166,17 +166,22 @@ public class Usuario extends javax.swing.JFrame {
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM libros WHERE titulo='" + txtBuscar.getText() + "'");
             Statement st2 = cn.createStatement();
-            ResultSet rs2 = st2.executeQuery("SELECT a.paises_id_pais, b.pais FROM libros a, paises b WHERE a.paises_id_pais=b.id_pais");
+            ResultSet rs2 = st2.executeQuery("SELECT * FROM paises a JOIN libros b ON a.id_pais=b.paises_id_pais WHERE b.titulo='" + txtBuscar.getText() + "'");
             Statement st3 = cn.createStatement();
-            ResultSet rs3 = st3.executeQuery("SELECT a.editoriales_id_editorial, b.editorial FROM libros a, editoriales b WHERE a.editoriales_id_editorial=b.id_editorial");
+            ResultSet rs3 = st3.executeQuery("SELECT * FROM editoriales a JOIN libros b ON a.id_editorial=b.editoriales_id_editorial WHERE b.titulo='" + txtBuscar.getText() + "'");
             Statement st4 = cn.createStatement();
-            String datos[] = new String[5];
-            while (rs.next() && rs2.next() && rs3.next()) {
+            ResultSet rs4 = st4.executeQuery("SELECT * FROM autores a JOIN libros_autores b ON a.id_autor=b.autores_id_autor JOIN libros c ON b.libros_id_libro=c.id_libro WHERE c.titulo='" + txtBuscar.getText() + "'");
+            Statement st5 = cn.createStatement();
+            ResultSet rs5 = st5.executeQuery("SELECT * FROM categoria a JOIN libros_categoria b ON a.id_categoria=b.categoria_id_categoria JOIN libros c ON b.libros_id_libro=c.id_libro WHERE c.titulo='" + txtBuscar.getText() + "'");
+            String datos[] = new String[7];
+            if (rs.next() && rs2.next() && rs3.next() && rs4.next() && rs5.next()) {
                 for (int i = 0; i <= 2; i++) {
                     datos[i] = rs.getString(i + 1);
                 }
                 datos[4] = rs2.getString(2);
                 datos[3] = rs3.getString(2);
+                datos[5] = rs4.getString(2);
+                datos[6] = rs5.getString(2);
                 modelo.addRow(datos);
             }
         } catch (Exception e) {
@@ -190,18 +195,22 @@ public class Usuario extends javax.swing.JFrame {
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM libros ");
             Statement st2 = cn.createStatement();
-            ResultSet rs2 = st2.executeQuery("SELECT a.paises_id_pais, b.pais FROM libros a, paises b WHERE a.paises_id_pais=b.id_pais");
+            ResultSet rs2 = st2.executeQuery("SELECT * FROM paises a JOIN libros b ON a.id_pais=b.paises_id_pais");
             Statement st3 = cn.createStatement();
-            ResultSet rs3 = st3.executeQuery("SELECT a.editoriales_id_editorial, b.editorial FROM libros a, editoriales b WHERE a.editoriales_id_editorial=b.id_editorial");
+            ResultSet rs3 = st3.executeQuery("SELECT * FROM editoriales a JOIN libros b ON a.id_editorial=b.editoriales_id_editorial");
             Statement st4 = cn.createStatement();
-            //ResultSet rs4 = st4.executeQuery("SELECT a.id_libros_autores, b.id_libro c.autores_id_autor d.id_autor FROM libros_autores a, libros b, libros_autores c, autores d WHERE a.id_libros_autores=b.id_libros, b");
-            String datos[] = new String[5];           
-            while (rs.next() && rs2.next() && rs3.next()) {
+            ResultSet rs4 = st4.executeQuery("SELECT * FROM autores a JOIN libros_autores b ON a.id_autor=b.autores_id_autor JOIN libros c ON b.libros_id_libro=c.id_libro");
+            Statement st5 = cn.createStatement();
+            ResultSet rs5 = st5.executeQuery("SELECT * FROM categoria a JOIN libros_categoria b ON a.id_categoria=b.categoria_id_categoria JOIN libros c ON b.libros_id_libro=c.id_libro");
+            String datos[] = new String[7];
+            while (rs.next() && rs2.next() && rs3.next() && rs4.next() && rs5.next()) {
                 for (int i = 0; i <= 2; i++) {
                     datos[i] = rs.getString(i + 1);
                 }
                 datos[4] = rs2.getString(2);
                 datos[3] = rs3.getString(2);
+                datos[5] = rs4.getString(2);
+                datos[6] = rs5.getString(2);
                 modelo.addRow(datos);
             }
         } catch (Exception e) {

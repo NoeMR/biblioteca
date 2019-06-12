@@ -86,9 +86,16 @@ public class FormularioInicial extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAdministradorActionPerformed
 
     private void btnUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsuarioActionPerformed
-        Usuario ventana = new Usuario();
-        ventana.setVisible(true);
+        Usuario ventana;
+        try {
+            ventana = new Usuario();
+            ventana.setVisible(true);
         this.setVisible(false);
+        } catch (SQLException ex) {
+            Logger.getLogger(FormularioInicial.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(FormularioInicial.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnUsuarioActionPerformed
 
     /**
